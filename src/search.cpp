@@ -643,7 +643,7 @@ int16_t Engine::negamax(Board &board, int depth, int alpha, int beta, int16_t pl
             continue;
         }
 
-        stack[ply].ch_entry = &(*conthistTable)[board.getColorToMove()][getType(board.pieceAtIndex(moveEndSquare))][moveEndSquare][moveVictim];
+        stack[ply].ch_entry = &(*conthistTable)[1 - board.getColorToMove()][getType(board.pieceAtIndex(moveEndSquare))][moveEndSquare][moveVictim];
         stack[ply].move = move;
         testedMoves[legalMoves] = move;
         legalMoves++;
