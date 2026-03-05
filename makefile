@@ -20,7 +20,7 @@ endif
 # Build type (can be overridden: make BUILD_TYPE=datagen)
 BUILD_TYPE ?= uci
 
-CXXFLAGS := -std=c++20 -flto $(ARCH) -fexceptions -Wall -Wextra -pthread
+CXXFLAGS := -std=c++20 -march=haswell -mbmi2 -mavx2 -fexceptions -Wall -Wextra
 _THIS     := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 _ROOT     := $(_THIS)
 DEFAULT_NET_NAME := $(file < network.txt)
