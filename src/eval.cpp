@@ -221,7 +221,7 @@ int NetworkState::getFeatureIndex(int square, int piece, int color, int king) {
 }
 
 int getBucket(int pieceCount) {
-    const int divisor = (32 + outputBucketCount - 1) / outputBucketCount;
+    static constexpr int divisor = (32 + outputBucketCount - 1) / outputBucketCount;
     return (pieceCount - 2) / divisor;
 }
 
@@ -341,18 +341,13 @@ void NetworkState::activateFeature(int square, int piece, int blackKing, int whi
     activateFeatureSingle(square, piece, 1, whiteKing);
 }
 
-void NetworkState::activateFeatureSingle(int square, int piece, int color, int king){ 
+void NetworkState::activateFeatureSingle(int square, int piece, int color, int king) {
     const int index = getFeatureIndex(square, piece, color, king);
-
-    // change values for all of them
-    if(color == 0) {
-        for(int i = 0; i < layer1Size; ++i) {
-            stack[current].black[i] += network->featureWeights[index * layer1Size + i];
-        }
-    } else {
-        for(int i = 0; i < layer1Size; ++i) {
-            stack[current].white[i] += network->featureWeights[index * layer1Size + i];
-        }
+    int16_t* acc = (color == 0) ? stack[current].black.data() : stack[current].white.data();
+    const int16_t* w = &network->featureWeights[index * layer1Size];
+    for (int i = 0; i < layer1Size; i += 8) {
+        __m128i v = _mm_add_epi16(_mm_loadu_si128((__m128i*)&acc[i]), _mm_loadu_si128((__m128i*)&w[i]));
+        _mm_storeu_si128((__m128i*)&acc[i], v);
     }
 }
 
